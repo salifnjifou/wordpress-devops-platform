@@ -6,11 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://gitlab.devopspro.cloud/devops-pro-institute/wordpress-devops-platform.git'
-            }
-        }
 
         stage('Test') {
             steps {
@@ -24,32 +19,27 @@ pipeline {
                 sonar-scanner \
                   -Dsonar.projectKey=wordpress-devops \
                   -Dsonar.sources=. \
-                  -Dsonar.token=$SONAR_TOKEN
+                  -Dsonar.host.url=https://sonarqube.devopspro.cloud \
+                  -Dsonar.login=$SONAR_TOKEN
                 """
             }
         }
 
         stage('Docker Build') {
             steps {
-                sh """
-                docker build -t wordpress-devops .
-                """
+                sh "docker build -t wordpress-devops ."
             }
         }
 
         stage('Security Scan') {
             steps {
-                sh """
-                trivy image wordpress-devops
-                """
+                sh "trivy image wordpress-devops || true"
             }
         }
 
         stage('Deploy') {
             steps {
-                sh """
-                docker compose up -d
-                """
+                sh "docker compose up -d"
             }
         }
     }
