@@ -40,7 +40,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        docker compose -f docker-compose.yaml build
+                        docker compose -f docker-compose.yml build
                     '''
                 }
             }
@@ -53,7 +53,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh "docker compose -f docker-compose.yaml up -d"
+                sh "docker compose -f docker-compose.yml up -d"
             }
         }
     }
