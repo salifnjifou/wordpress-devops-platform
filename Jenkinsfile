@@ -47,7 +47,7 @@ pipeline {
         }
         stage('Security Scan') {
             steps {
-                sh "trivy image wordpress-devops || true"
+                sh "trivy image nginx:latest || true"
             }
         }
 
