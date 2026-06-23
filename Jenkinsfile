@@ -36,13 +36,15 @@ pipeline {
                 }
             } 
         }
-
         stage('Docker Build') {
             steps {
-                sh "docker build -t wordpress-devops ."
+                script {
+                    sh '''
+                        docker compose -f docker-compose.yaml build
+                    '''
+                }
             }
         }
-
         stage('Security Scan') {
             steps {
                 sh "trivy image wordpress-devops || true"
@@ -51,7 +53,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh "docker compose up -d"
+                sh "docker compose -f docker-compose.yaml up -d"
             }
         }
     }
