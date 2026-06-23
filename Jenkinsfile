@@ -13,16 +13,28 @@ pipeline {
             }
         }
 
-        stage('SonarQube Scan') {
+         stage('SonarQube Analysis') {
             steps {
-                sh """
-                sonar-scanner \
-                  -Dsonar.projectKey=wordpress-devops \
-                  -Dsonar.sources=. \
-                  -Dsonar.host.url=https://sonarqube.devopspro.cloud \
-                  -Dsonar.login=$SONAR_TOKEN
-                """
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=wordpress-devops \
+                            -Dsonar.projectName=wordpress-devops \
+                            -Dsonar.sources=.
+                        """
+                    }
+                }
             }
+        }
+        stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'wordpress-devops-salif' 
+                }
+            } 
         }
 
         stage('Docker Build') {
